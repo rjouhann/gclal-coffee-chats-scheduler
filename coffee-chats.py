@@ -167,6 +167,7 @@ def create_calendar_event(calendar_service, person1, person2, start_time, end_ti
     'reminders': {
         'useDefault': False,  # Disable default reminders
         'overrides': [
+            {'method': 'popup', 'minutes': 1440}, # Show a pop-up notification 1 day before the event
             {'method': 'popup', 'minutes': 10},  # Show a pop-up notification 10 minutes before the event
         ],
     },
@@ -256,7 +257,7 @@ def schedule_coffee_chats_with_tz(calendar_service, sheets_service, spreadsheet_
     expected_meetings = len(group1) * len(group2)
     print(f"Expected total number of meetings (full pairing): {expected_meetings}")
 
-    start_date = datetime.now(timezone.utc)
+    start_date = datetime.now(timezone.utc) + timedelta(weeks=1) # Start 1st meeting a week from when the script is executed
     event_count = 0
     latest_event_date = None
     line_count = 0
