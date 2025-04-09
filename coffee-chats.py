@@ -144,50 +144,54 @@ def create_calendar_event(calendar_service, person1, person2, start_time, end_ti
     event_body = {
     'summary': summary,
     'description': '''Some ideas:
-• Discuss what is coming up in the next few weeks
-• The roadmap: https://gitguardian.productboard.com/roadmap/8538423-launch-plan-saas
+• What are you working on these days? Any exciting ongoing deals?
+• Discuss the roadmap: https://gitguardian.productboard.com/roadmap/8538423-launch-plan-saas
 • Dive into a specific feature
 • User Experience feedback
 • Share insights from a recent customer interaction
 • Chat about the 🌤️!
 
 ⚠️ If this time does not work, please feel free to reschedule!''',
-    'start': {
-        'dateTime': start_time.isoformat(),
-        'timeZone': 'UTC',
-    },
-    'end': {
-        'dateTime': end_time.isoformat(),
-        'timeZone': 'UTC',
-    },
-    'attendees': [
-        {'email': person1[2]},
-        {'email': person2[2]},
-    ],
-    'reminders': {
-        'useDefault': False,  # Disable default reminders
-        'overrides': [
-            {'method': 'popup', 'minutes': 1440}, # Show a pop-up notification 1 day before the event
-            {'method': 'popup', 'minutes': 10},  # Show a pop-up notification 10 minutes before the event
+        'start': {
+            'dateTime': start_time.isoformat(),
+            'timeZone': 'UTC',
+        },
+        'end': {
+            'dateTime': end_time.isoformat(),
+            'timeZone': 'UTC',
+        },
+        'attendees': [
+            {'email': person1[2]},
+            {'email': person2[2]},
         ],
-    },
-    'sendUpdates': 'none' if not send_email else 'all',  # Disable emails if specified
-    'guestsCanModify': True,  # Allow guests to modify the event
-    'transparency': 'opaque',   # this makes it show as "busy"
+        'sendUpdates': 'none' if not send_email else 'all',  # Disable emails if specified
+        'guestsCanModify': True,  # Allow guests to modify the event
+        'transparency': 'opaque',   # this makes it show as "busy"
+        'conferenceData': {
+            'createRequest': {
+                'conferenceSolutionKey': {
+                    'type': 'hangoutsMeet'
+                },
+                'status': {
+                    'statusCode': 'success'
+                },
+                'requestId': 'RandomString' # random request ID. it will actually generate a random google meet
+            }
+        },
+        'organizer': {'email': person1[2]},
     }
 
     event = calendar_service.events().insert(
         calendarId=calendar_id,  # Specify the calendar where you want the event to be created
-        body=event_body
+        body=event_body,
+        conferenceDataVersion=1
     ).execute()
 
-    # Show details of the event that was created
-    event_details = f"Event created: {event.get('htmlLink')} for {person1[0]} and {person2[0]} at {start_time.strftime('%Y-%m-%d %H:%M:%S')} UTC"
-
     if debug:
-        print(event_details)
-    else:
-        print(event_details)  # Display even when not in debug mode
+        # Show details of the event that was created
+        event_details = f"Event created: {event.get('htmlLink')} for {person1[0]} and {person2[0]} at {start_time.strftime('%Y-%m-%d %H:%M:%S')} UTC"
+
+    print(event_details)
     return True
 
 # Convert Paris time to UTC
